@@ -17,6 +17,4 @@ https://www.youtube.com/watch?v=eQpWPfP1T6g
 
 ## Objectives
 
-
-
-https://github.com/user-attachments/assets/f6227631-ec43-4184-9f3d-7f5f8eba9529
+https://github.com/user-attachments/assets/bd2116aa-884a-4e20-8ad7-3a239debf9af
