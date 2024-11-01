@@ -10,7 +10,7 @@ public class Rotate : MonoBehaviour
 
     void Update()
     {
-        pitch += Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
+        pitch -= Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
         yaw += Input.GetAxis("Mouse X") * sensitivity * Time.deltaTime;
         transform.rotation = Quaternion.Euler(pitch, yaw, 0);
     }
