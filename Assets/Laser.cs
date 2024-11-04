@@ -5,20 +5,19 @@ public class Laser : MonoBehaviour
     public LineRenderer trail;
     public Renderer spot;
 
-    void LateUpdate()
+    void Update()
     {
         float distance = Camera.main.farClipPlane;
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, transform.forward, out hit, distance))
+        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, distance))
         {
             distance = hit.distance;
-            spot.transform.position = hit.point;
-            spot.gameObject.SetActive(true);
+            spot.enabled = true;
         }
         else
         {
-            spot.gameObject.SetActive(false);
+            spot.enabled = false;
         }
         trail.SetPosition(1, Vector3.forward * distance);
+        spot.transform.localPosition = Vector3.forward * distance;
     }
 }
