@@ -39,7 +39,7 @@ If you want to copy my scene, I created the following:
 | Box (2) |  0.1, 1.5, -6.5 | 0, -6, 0 | 2, 1, 1 |
 | Ball | 0, 2.5, -6.4 | 0, 0, 0 | 1, 1, 1 |
 
-And I gave the objects some basic materials to make them show up better. I also moved the camera height up to `Y 1.8`. This is an approximate eye height assuming Unity units of $1 = 1m$.
+And I gave the objects some basic materials to make them show up better. I also moved the camera height up to `Y 1.5`. This is an approximate eye height assuming Unity units of $1 = 1m$.
 
 > [!TIP]
 > Unity physics defaults to a gravity of $-9.81\ units / second^2$. This implies a scale for Unity units of $1 = 1m$. You are free to build Unity projects at other scales, but if you want to approximately match Earth gravity you will need to adjust the gravity value to match your scaling, otherwise physical objects will either appear too floaty or fall too fast.
@@ -74,7 +74,7 @@ In Unity, ray casts themselves are invisible. But for this demonstration, I'd li
 | :--- | ---: | ---: | ---: |
 | Laser | 0, 0, 0 | 0, 0, 0 | 1, 1, 1 |
 
-By default this will look like a wide white blade because the default width of the line is $0.1m$ (or $10cm$) Unity units. :
+By default this will look like a wide white blade because the default width of the line is $0.1m$ (or $10cm$):
 ![what the laser looks like with the default line settings](https://github.com/user-attachments/assets/1b2345ff-e703-4871-8ff5-17f75052916c)
 
 We'll fix that now. In the `Line Renderer` component settings, change the width, by right clicking on the starting width dot and putting in a more realistic value for a laser beam. $0.002m$ (or $2mm$) should do.
@@ -87,7 +87,7 @@ I'll also take this opportunity to adjust the colour of the line. You can do thi
 
 The bottom left pointer sets the colour for the beginning of the line, and the bottom right pointer sets the colour for the end of the line.
 
-You can also adjust the length of the laser line by modifying the `Positions` section. For `Index 1` set the `Z` position to `1000`.
+You can also adjust the length of the laser line by modifying the `Positions` section. For `Index 1` set the `Z` position to `10`.
 
 ![a thin red laser line](https://github.com/user-attachments/assets/0e270c60-f18f-452a-bdea-f079cf3e95e1)
 
@@ -150,11 +150,11 @@ void Update()
 
 With this code we are setting a local variable `distance` to the distance to the far clipping plane of the camera. Then we are setting the position of index 1 on our `trail` variable. Our variable declaration above means that `trail` points to the `Line Renderer` that we set in the Unity inspector.
 
-The position we are setting is the forward vector `(0, 0, 1)` multiplied by the `distance` variable that we get from the main camera. If we run this script in Unity, and look at the `Positions` section on the `Line Renderer` we should see that is has been set to the camera's far clip distance. (The default far clip distance will be `1000`.)
+The position we are setting is the forward vector `(0, 0, 1)` multiplied by the `distance` variable that we get from the main camera. If we run this script in Unity, and look at the `Positions` section on the `Line Renderer` we should see that it has been set to the camera's far clip distance. (The default far clip distance will be `1000`.)
 
 ![the line end position has been set to Z 1000](https://github.com/user-attachments/assets/41285ef7-c562-4acd-8643-9238e3b26c4f)
 
-Assuming this works, we can move on to consider the case where the laser does hit an object. To perform a `Raycast` we need to call the function [`Physics.Raycast`](https://docs.unity3d.com/2022.3/Documentation/ScriptReference/Physics.Raycast.html). There are several versions of this function, but we need a version of this function that returns a `RaycastHit` data structure as this contains the distance to the hit objects. The function returns a boolean value (true or false) to let us know if an object was hit, and if it was, it fills in a `RaycastHit` data structure containing the details of the hit.
+Assuming this works, we can move on to consider the case where the laser *does* hit an object. To perform a `Raycast` we need to call the function [`Physics.Raycast`](https://docs.unity3d.com/2022.3/Documentation/ScriptReference/Physics.Raycast.html). There are several versions of this function, but we need a version of this function that returns a `RaycastHit` data structure as this contains the distance to the hit objects. The function also returns a boolean value (true or false) to let us know if an object was hit, and if it was, it fills in a `RaycastHit` data structure containing the details of the hit.
 
 ```cs
 if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, distance))
@@ -170,7 +170,7 @@ In this conditional statement:
 - `Physics.Raycast` is the function of the physics class that we are calling
 - `()` the brackets following the function give the arguments as a comma separated list
 - `transform.position` we are using this object's position as the `origin` for the raycast
-- `transform.forward` we are using this object's direction as the `direction` of the raycast
+- `transform.forward` we are using this object's forward vector as the `direction` of the raycast
 - `out` states that the following argument is an output value
 - `RaycastHit` is the type of the output value
 - `hit` is our name for the output value
@@ -179,9 +179,8 @@ In this conditional statement:
 > [!NOTE]
 > We previously set the `distance` variable to the distance to the camera's far plane, the ray should reach at least that far if the `origin` of the ray is in front of the camera. We are using the variable `distance` here for two different purposes in this code.
 
-Following the condition is the code to execute if the condition is true. In this case, if the ray we specified, hit something.
+Following the condition is the code to execute if the condition is true. In this case, if the ray we specified, hit something:
 
-Here:
 - `{`...`}` the code to execute if the condition is true goes within these brackets
 - `distance` is our variable representing the length of the ray
 - `=` means we are going to overwrite the current value in this variable
@@ -191,7 +190,7 @@ Here:
 
 Try out this code by switching back to Unity, hitting the play button, and examining the `Positions` data. You should see the `Z` value of `Index 1` changing as you move the laser around the scene.
 
-![the Z position when targeting the laser pointer at a sphere](https://github.com/user-attachments/assets/4f70288b-91af-46ec-8a52-6719063d014b)
+![the Z position when targeting the laser pointer at the sphere](https://github.com/user-attachments/assets/4f70288b-91af-46ec-8a52-6719063d014b)
 
 ## Adding a spot
 
@@ -204,9 +203,9 @@ To make the laser hit point a bit more visible, we can add a point of light at t
 For this, I'm going to use the first method as it is the simplest to set up and code.
 
 > [!WARNING]
-> If you want to use the other methods, you have to take care that the hit point is slightly in front of the object geometry, otherwise the effect could be partially or fully obscured by the object. The unlit sphere method doesn't suffer this problem because the geometry of the sphere itself will poke through the geometry.
+> If you want to use the other methods, you have to take care that the hit point is slightly in front of the object geometry, otherwise the effect could be partially or fully obscured by the object. The unlit sphere method doesn't suffer this problem because the geometry of the sphere itself will poke through.
 
-Start by create a new sphere object as a child of the `Laser` object and call it "Spot". Making it a child means we can control it's position just by adjusting the `Z` position value. We also want to remove the `Collider` that Unity automatically adds to this new object. This is to ensure that the raycast doesn't hit this object and break the behaviour.
+Start by creating a new sphere object as a child of the `Laser` object and call it "Spot". Making it a child means we can control it's position just by adjusting the `Z` position value. We also want to remove the `Collider` that Unity automatically adds to this new object. This is to ensure that the raycast doesn't hit this object and break the behaviour.
 
 The scale of the sphere should be small, but keep in mind that the further this spot is from the camera, the smaller it will appear. For this reason, I've set mine to the relatively large value of $0.02m$ ($2cm$) diameter.
 
@@ -244,7 +243,7 @@ Test this code in Unity to see if the spot follows the hit point of the ray.
 
 There is a potential issue which could occur if the ray origin started behind the camera. In that case, the spot might be placed at the end of the laser line even if the ray didn't intersect anything.
 
-To address this we can tell Unity to render the spot only in the case that ray hits an object. To do that, we can change our `if` conditional to an `if`...`else`. With an `else` directive, the bracketed section after the `else` statement is executed only if the condition is not true.
+To address this we can tell Unity to render the spot only in the case that the ray hits an object. To do that, we can change our `if` conditional to an `if` ... `else` statement. With an added `else` directive, the bracketed section after the `else` statement is executed only if the condition is not true.
 
 ```cs
 if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, distance))
