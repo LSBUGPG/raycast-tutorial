@@ -27,7 +27,7 @@ Create a new 3D Core Unity project.
 
 Before we can demonstrate our laser effect, we'll need something to stop the light beam. Create a ground plane and scatter some primitives in front of the camera. By default, each of these primitive objects should already have a collider attached, which we will need for the ray to collide against.
 
-![image](https://github.com/user-attachments/assets/a76140eb-06ad-4456-a33a-9ebdb6b00878)
+![a sample scene](https://github.com/user-attachments/assets/a76140eb-06ad-4456-a33a-9ebdb6b00878)
 
 If you want to copy my scene, I created the following:
 
@@ -177,7 +177,7 @@ In this conditional statement:
 - `distance` is the length of the raycast
 
 > [!NOTE]
-> We previously set the `distance` variable to the distance to the camera far plane, the ray should reach at least that far if the `origin` of the ray is in front of the camera. We are using the variable `distance` here for two different purposes in this code.
+> We previously set the `distance` variable to the distance to the camera's far plane, the ray should reach at least that far if the `origin` of the ray is in front of the camera. We are using the variable `distance` here for two different purposes in this code.
 
 Following the condition is the code to execute if the condition is true. In this case, if the ray we specified, hit something.
 
