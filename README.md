@@ -141,11 +141,11 @@ Now we can test this connection by setting the length of the `Line Renderer` in 
 Fill in the `Update` function:
 
 ```cs
-    void Update()
-    {
-        float distance = Camera.main.farClipPlane;
-        trail.SetPosition(1, Vector3.forward * distance);
-    }
+void Update()
+{
+    float distance = Camera.main.farClipPlane;
+    trail.SetPosition(1, Vector3.forward * distance);
+}
 ```
 
 With this code we are setting a local variable `distance` to the distance to the far clipping plane of the camera. Then we are setting the position of index 1 on our `trail` variable. Our variable declaration above means that `trail` points to the `Line Renderer` that we set in the Unity inspector.
@@ -157,20 +157,20 @@ The position we are setting is the forward vector `(0, 0, 1)` multiplied by the 
 Assuming this works, we can move on to consider the case where the laser does hit an object. To perform a `Raycast` we need to call the function [`Physics.Raycast`](https://docs.unity3d.com/2022.3/Documentation/ScriptReference/Physics.Raycast.html). There are several versions of this function, but we need a version of this function that returns a `RaycastHit` data structure as this contains the distance to the hit objects. The function returns a boolean value (true or false) to let us know if an object was hit, and if it was, it fills in a `RaycastHit` data structure containing the details of the hit.
 
 ```cs
-        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, distance))
-        {
-            distance = hit.distance;
-        }
+if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, distance))
+{
+    distance = hit.distance;
+}
 ```
 
 In this conditional statement:
 - `if` is the instruction
 - `(`...`)` the condition to test goes within these brackets
 - `Physics` is the name of Unity's physics class
-- `Raycast` is the function of the physics class that we are calling
+- `Physics.Raycast` is the function of the physics class that we are calling
 - `()` the brackets following the function give the arguments as a comma separated list
-- `transform.position` is the `origin` for the raycast.
-- `transform.forward` is the `direction` of the raycast.
+- `transform.position` we are using this object's position as the `origin` for the raycast
+- `transform.forward` we are using this object's direction as the `direction` of the raycast
 - `out` states that the following argument is an output value
 - `RaycastHit` is the type of the output value
 - `hit` is our name for the output value
@@ -188,3 +188,110 @@ Here:
 - `hit` is the variable we defined in the `out` argument
 - `hit.distance` is the distance to the hit point returned by the raycast
 - `;` this defines the end of the instruction
+
+Try out this code by switching back to Unity, hitting the play button, and examining the `Positions` data. You should see the `Z` value of `Index 1` changing as you move the laser around the scene.
+
+![the Z position when targeting the laser pointer at a sphere](https://github.com/user-attachments/assets/4f70288b-91af-46ec-8a52-6719063d014b)
+
+## Adding a spot
+
+To make the laser hit point a bit more visible, we can add a point of light at the hit point of the raycast. There are several methods to achieve this kind of effect.
+
+- small unlit sphere
+- unlit quad with a particle texture
+- realtime light with or without a halo
+
+For this, I'm going to use the first method as it is the simplest to set up and code.
+
+> [!WARNING]
+> If you want to use the other methods, you have to take care that the hit point is slightly in front of the object geometry, otherwise the effect could be partially or fully obscured by the object. The unlit sphere method doesn't suffer this problem because the geometry of the sphere itself will poke through the geometry.
+
+Start by create a new sphere object as a child of the `Laser` object and call it "Spot". Making it a child means we can control it's position just by adjusting the `Z` position value. We also want to remove the `Collider` that Unity automatically adds to this new object. This is to ensure that the raycast doesn't hit this object and break the behaviour.
+
+The scale of the sphere should be small, but keep in mind that the further this spot is from the camera, the smaller it will appear. For this reason, I've set mine to the relatively large value of $0.02m$ ($2cm$) diameter.
+
+You can create a material and select the unlit shader and set the colour to the same colour as your laser. The reason you want to use an unlit shader is that it will therefore be unaffected by lighting in the scene.
+
+To position the spot in code, we just need to add a couple of extra pieces to our `Laser` script. To start, add a member variable under the existing `trail` variable:
+
+```cs
+public LineRenderer trail;
+public Renderer spot;
+```
+
+Again, switch back to Unity and assign the `Spot` slot in the `Laser` script by dragging the object named "Spot" into it.
+
+Now, in the script we can set the position of the spot based on the `distance` variable we already calculated. We can do this by adding a line to the end of our existing `Update` function:
+
+```cs
+spot.transform.localPosition = Vector3.forward * distance;
+```
+
+Here:
+- `spot` is the member variable we defined to point to the unlit sphere
+- `spot.transform` is the transform of that object
+- `spot.transform.localPosition` is the position in local coordinates
+- `=` means we are replacing the existing value
+- `Vector3` is the Unity class representing 3D coordinates
+- `Vector3.forward` is the vector (0, 0, 1)
+- `*` means we are multiplying this value
+- `distance` is the distance along the ray to the hit point
+- `;` the end of the instruction
+
+Test this code in Unity to see if the spot follows the hit point of the ray.
+
+## Hiding the spot
+
+There is a potential issue which could occur if the ray origin started behind the camera. In that case, the spot might be placed at the end of the laser line even if the ray didn't intersect anything.
+
+To address this we can tell Unity to render the spot only in the case that ray hits an object. To do that, we can change our `if` conditional to an `if`...`else`. With an `else` directive, the bracketed section after the `else` statement is executed only if the condition is not true.
+
+```cs
+if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, distance))
+{
+    distance = hit.distance;
+    spot.enabled = true;
+}
+else
+{
+    spot.enabled = false;
+}
+```
+
+You can test this by monitoring the `Mesh Renderer` flag on the `Spot` object in the inspector window while the project is playing. Or you can see if the rendering switches off in the Scene view by zooming in on the spot location when the ray is pointing into the sky.
+
+## Review
+
+In this tutorial we have simulated a laser pointer by using Unity's raycast functionality to detect the point of intersection between a ray and an object in the scene.
+
+The completed code looks like this:
+
+```cs
+using UnityEngine;
+
+public class Laser : MonoBehaviour
+{
+    public LineRenderer trail;
+    public Renderer spot;
+
+    void Update()
+    {
+        float distance = Camera.main.farClipPlane;
+        if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, distance))
+        {
+            distance = hit.distance;
+            spot.enabled = true;
+        }
+        else
+        {
+            spot.enabled = false;
+        }
+        trail.SetPosition(1, Vector3.forward * distance);
+        spot.transform.localPosition = Vector3.forward * distance;
+    }
+}
+```
+
+Executing the project should produce a result similar to that set out in our objective:
+
+https://github.com/user-attachments/assets/d93b8ab3-b649-4e15-9596-60e5c6b04c49
