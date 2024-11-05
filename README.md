@@ -77,9 +77,9 @@ In Unity, ray casts themselves are invisible. But for this demonstration, I'd li
 By default this will look like a wide white blade because the default width of the line is $0.1m$ (or $10cm$):
 ![what the laser looks like with the default line settings](https://github.com/user-attachments/assets/1b2345ff-e703-4871-8ff5-17f75052916c)
 
-We'll fix that now. In the `Line Renderer` component settings, change the width, by right clicking on the starting width dot and putting in a more realistic value for a laser beam. $0.002m$ (or $2mm$) should do.
+We'll fix that now. In the `Line Renderer` component settings, change the width, by clicking in width box and putting in a more realistic value for a laser beam. $0.002m$ (or $2mm$) should do.
 
-![adjusting the laser width](https://github.com/user-attachments/assets/1120e394-e183-4b36-bc57-424a74c2d0cc)
+![adjusting the laser width](https://github.com/user-attachments/assets/1e982dc8-703f-4c6d-82a1-2da599c98663)
 
 I'll also take this opportunity to adjust the colour of the line. You can do this by clicking on the `Color` box. However, the colour editor in this case is different to normal as you can set multiple colour values. For example, you can set the start and end of the line to different colours. In this tutorial, I am setting both the start and end of the line to red.
 
